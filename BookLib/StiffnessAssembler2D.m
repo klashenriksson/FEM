@@ -7,10 +7,7 @@ for K = 1:nt
   x = p(1,loc2glb); % node x-coordinates
   y = p(2,loc2glb); % node y-
   [area,b,c] = HatGradients(x,y);
-  xc = mean(x); yc = mean(y); % element centroid
-  abar = a(xc,yc); % value of a(x,y) at centroid
-  AK = abar*(b*b'...
-    +c*c')*area; % element stiffness matrix
-  A(loc2glb,loc2glb) = A(loc2glb,loc2glb) ...
-       + AK; % add element stiffnesses to A
-   end
+  AK = NumIntegTrig(x,y,@(x,y) a(x,y).*(b.*b + c.*c));
+  A(loc2glb,loc2glb) = A(loc2glb,loc2glb) + AK; % add element stiffnesses to A
+end
+end

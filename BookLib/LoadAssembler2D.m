@@ -6,10 +6,10 @@ for K = 1:nt
   loc2glb = t(1:3,K);
   x = p(1,loc2glb);
   y = p(2,loc2glb);
-  area = polyarea(x,y);
-  bK = [f(x(1),y(1));
-        f(x(2),y(2));
-        f(x(3),y(3))]/3*area; % element load vector
-  b(loc2glb) = b(loc2glb) ...
-    + bK; % add element loads to b
+
+  bK_1 = NumIntegTrig(x,y, f, @(r,s) 1 - r - s);
+  bK_2 = NumIntegTrig(x,y,f, @(r,s) r);
+  bK_3 = NumIntegTrig(x,y,f, @(r,s) s);
+  bK = [bK_1;bK_2;bK_3];
+  b(loc2glb) = b(loc2glb) + bK;
 end
