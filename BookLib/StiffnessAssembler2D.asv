@@ -10,18 +10,9 @@ for K = 1:nt
   % grad phi_i = [b(1), c(1)]
   % grad phi_i+1 = [b(2), c(2)]
   phi_1 = [b(1), c(1)];
-  phi_2 = [b(2), c(2)];
-  phi_3 = [b(3), c(3)];
+  phi_2 = [b(2)]
 
-  phis = [phi_1;phi_2;phi_3];
-
-  AK = zeros(size(phis,1), size(phis, 1));
-  for i=1:size(phis, 1)
-      for j = 1:size(phis, 1)
-          AK(i,j) = NumIntegTrig(x,y, @(x,y) a(x,y).*dot(phis(i,:), phis(j,:)));
-      end
-  end
-
+  AK = NumIntegTrig(x,y,@(x,y) a(x,y).*(b*b' + c*c'));
   A(loc2glb,loc2glb) = A(loc2glb,loc2glb) + AK; % add element stiffnesses to A
 end
 end
