@@ -30,12 +30,27 @@ for i = 1:length(hs)
 
     errors_l2(i) = L2Error2D(p,t,u_analytic, U);
 
-    % |||u||| = int_omega (x^2) dx = 1/3
-    u_anal_energy = 1/9;
-    errors_energy(i) = u_anal_energy - U'*A*U;
+    % |||u|||^2 = int_omega (x^2) dx = 1/3
+    u_anal_energy = 1/3;
+    errors_energy(i) = sqrt(u_anal_energy - U'*A*U);
 end
 %%
 eoc_errors_l2 = EOC(errors_l2, hs);
+eoc_errors_energy = EOC(errors_energy, hs);
+
+figure;
+loglog(hs, errors_l2);
+hold on
+loglog(hs, 2.*hs); % we expect h^2 convergence
+legend('FEM solution', 'Analytical')
+figure;
+loglog(hs, errors_energy);
+hold on
+loglog(hs, 1.*hs); % we expect h^1 convergence
+legend('FEM solution', 'Analytical')
+
+disp('EOC L2 Error: ' + mean(eoc_errors_l2))
+disp('EOC Energy Error: ' + mean(eoc_errors_energy))
 
 function [U, p, e, t, A] = U_FEM(h, f, g_D, a)
 g = Rectg(0,0,1,1); % unit square
