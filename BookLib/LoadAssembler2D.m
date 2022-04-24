@@ -7,9 +7,9 @@ for K = 1:nt
   x = p(1,loc2glb);
   y = p(2,loc2glb);
 
-  bK_1 = NumIntegTrig(x,y, f, @(r,s) 1 - r - s);
-  bK_2 = NumIntegTrig(x,y,f, @(r,s) r);
-  bK_3 = NumIntegTrig(x,y,f, @(r,s) s);
+  bK_1 = NumIntegTrig(x, y, f, @(r,s) 1 - r - s);
+  bK_2 = NumIntegTrig(x, y, f, @(r,s) r);
+  bK_3 = NumIntegTrig(x, y, f, @(r,s) s);
   bK = [bK_1;bK_2;bK_3];
   b(loc2glb) = b(loc2glb) + bK;
 end

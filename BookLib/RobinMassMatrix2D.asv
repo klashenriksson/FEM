@@ -1,0 +1,50 @@
+function R = RobinMassMatrix2D(p, e, t, TR, kappa)
+np = size(p,2); % number of nodes
+ne = size(e,2); % number of boundary edges
+R = sparse(np,np); % allocate boundary matrix
+
+
+for E = 1:ne
+
+    n1 = e(1,E); n2 = e(2,E); % nodes defining edge
+    ti = TR.edgeAttachments(n1,n2); k = ti{1}; % identify element
+    
+    t_index = t(1:3, k);
+
+    xtri = p(1, t_index);
+    ytri = p(2, t_index);
+
+
+    loc2glb = e(1:2,E); % boundary nodes
+    xe = p(1,loc2glb); % node x-coordinates
+    ye = p(2,loc2glb); % node y-
+
+    % if 11: f(x1,y1) = 1, f(x2,y2) = 0
+    %        psi(x,y) = 1 - sqrt(((x-x1)^2 + (y-y1)^2) / ((x2-x1)^2 + (y2-y1)^2)
+    %
+    len = sqrt((xe(1)-xe(2))^2+(ye(1)-ye(2))^2);
+
+    phi1 = @ (x,y) 1 - sqrt((x-xe(1))^2 + (y-ye(1))^2) / len;
+    
+    RE = zeros(size(xe), size(xe));
+    
+    RE(1,1) = NumIntegEdge(xtri,ytri, xe,ye, @(x,y) kappa(x,y)*phi1(x,y)*phi1(x,y));
+    RE(2,2) = RE(1,1);
+    RE(1,2) = -RE(1,1);
+    RE(2,1) = -RE(1,2);
+
+    for i=1:size(xe)
+        for j=1:size(xe)
+            
+            RE(i,j) = NumIntegEdge(xtri, ytri, xe, ye, kappa);
+        end
+    end
+    
+    NumIntegEdge(xtri, ytri, xe, ye, f, g_rs)
+
+    len = sqrt((xe(1)-xe(2))^2+(ye(1)-ye(2))^2); % edge length
+    xc = mean(xe); yc = mean(ye); % edge mid-point
+    k = kappa(xc,yc); % value of kappa at mid-point
+    RE = k/6*[2 1; 1 2]*len; % edge boundary matrix
+    R(loc2glb,loc2glb) = R(loc2glb,loc2glb) + RE;
+end

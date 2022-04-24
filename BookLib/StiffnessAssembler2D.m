@@ -15,13 +15,14 @@ for K = 1:nt
 
   phis = [phi_1;phi_2;phi_3];
 
-  AK = zeros(size(phis,1), size(phis, 1));
+  AK = zeros(size(phis, 1), size(phis, 1));
   for i=1:size(phis, 1)
       for j = 1:size(phis, 1)
           AK(i,j) = NumIntegTrig(x,y, @(x,y) a(x,y).*dot(phis(i,:), phis(j,:)));
       end
   end
 
-  A(loc2glb,loc2glb) = A(loc2glb,loc2glb) + AK; % add element stiffnesses to A
+  A(loc2glb,loc2glb) = A(loc2glb,loc2glb) + AK ; % add element stiffnesses to A
 end
+
 end
