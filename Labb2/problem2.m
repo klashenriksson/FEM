@@ -1,74 +1,53 @@
 clear
+close all
 
-%% b)
-% choose u(x,y) = x^2/2
-g_D = @(x,y) x^2/2;
+gD = @(x,y) x^2/2;
+gN = @(x,y) pi*cos(pi) .* (x == 1) - pi*cos(0) .* (x==0);
 a = @(x,y) 1;
-f = @(x,y) -1;
+f = @(x,y) pi*pi*sin(pi*x);
+kappa = @(x,y) (0) .* (x > 0);
 
-h = 0.1;
-[U, p, e, t, ~] = U_FEM(h, f, g_D, a);
+h = 0.05;
+[U, p, e, t, A_tilde, b_tilde] = U_FEM_robin(h, f, a, kappa, gD, gN);
 
-%% c)
-u_analytic = @(x,y) x.^2/2;
+[V,D]=eigs(A_tilde,10,'sa');
+V_0 = V(:,1);
 
-pdesurf(p,t,U)
-hold on
+figure;
+pdesurf(p, t, V_0);
+xlabel('x')
+ylabel('y')
 
-X = linspace(0,1, 1/h);
-Y = linspace(0,1,1/h)';
-Z = (X.^2/2 + Y.*0);
-surf(X,Y,Z);
-
-%% d)
-hs = [0.2, 0.1, 0.05, 0.025];
-errors_l2 = zeros(length(hs), 1);
-errors_energy = zeros(length(hs), 1);
-
-for i = 1:length(hs)
-    [U, p, ~, t, A] = U_FEM(hs(i), f, g_D, a);
-
-    errors_l2(i) = L2Error2D(p,t,u_analytic, U);
-
-    % |||u|||^2 = int_omega (x^2) dx = 1/3
-    u_anal_energy = 1/3;
-    errors_energy(i) = sqrt(u_anal_energy - U'*A*U);
-end
 %%
-eoc_errors_l2 = EOC(errors_l2, hs);
-eoc_errors_energy = EOC(errors_energy, hs);
+
+a = LoadAssembler2D(p, t, @(x,y) 1);
+
+MEGAMATRIX = [A_tilde a; a' 0];
+LONG_LOAD = [b_tilde; 1];
+
+U_MAGIC = MEGAMATRIX\LONG_LOAD;
 
 figure;
-loglog(hs, errors_l2);
-hold on
-loglog(hs, 2.*hs); % we expect h^2 convergence
-legend('FEM solution', 'Analytical')
-figure;
-loglog(hs, errors_energy);
-hold on
-loglog(hs, 1.*hs); % we expect h^1 convergence
-legend('FEM solution', 'Analytical')
+pdesurf(p,t, U_MAGIC(1:end-1));
+xlabel('x')
+ylabel('y')
 
-disp('EOC L2 Error: ' + mean(eoc_errors_l2))
-disp('EOC Energy Error: ' + mean(eoc_errors_energy))
+%%
 
-function [U, p, e, t, A] = U_FEM(h, f, g_D, a)
+function [U, p, e, t, A_tilde, b_tilde] = U_FEM_robin(h, f, a, kappa, gD, gN)
 g = Rectg(0,0,1,1); % unit square
 [p,e,t] = initmesh(g,'hmax',h); % create mesh
+
 e = e(1:2,:);
-boundary_nodes = unique(e);
-boundary_values = zeros(length(boundary_nodes), 1);
-for i = 1:length(boundary_values)
-    boundary_values(i) = g_D(p(1, boundary_nodes(i)), p(2, boundary_nodes(i)));
-end
 
 A = StiffnessAssembler2D(p, t, a);
 b = LoadAssembler2D(p,t,f);
 
-[A_00, b_1, remainingdofs] = LockDofs(A, b, boundary_nodes, boundary_values);
+[R, r] = RobinAssembler2D(p, t, kappa, gD, gN);
 
-epsi_0 = A_00\b_1;
-U = zeros(length(b), 1);
-U(remainingdofs) = epsi_0;
-U(boundary_nodes) = boundary_values;
+A_tilde = A + R;
+b_tilde = b + r;
+
+U = A_tilde\b_tilde;
+
 end
