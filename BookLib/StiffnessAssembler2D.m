@@ -1,4 +1,4 @@
-function A = StiffnessAssembler2D(p,t,a)
+function A = StiffnessAssembler2D(p,t,a, quadpts)
 np = size(p,2);
 nt = size(t,2);
 A = sparse(np,np); % allocate stiffness matrix
@@ -18,7 +18,12 @@ for K = 1:nt
   AK = zeros(size(phis, 1), size(phis, 1));
   for i=1:size(phis, 1)
       for j = 1:size(phis, 1)
-          AK(i,j) = NumIntegTrig(x,y, @(x,y) a(x,y).*dot(phis(i,:), phis(j,:)));
+          if exist('quadpts', 'var')
+            integral = NumIntegTrig(x,y, @(x,y) dot(a(x,y)*phis(j,:)', phis(i,:)), @(x,y) 1, quadpts);
+          else
+            integral = NumIntegTrig(x,y, @(x,y) dot(a(x,y)*phis(j,:)', phis(i,:)));
+          end
+          AK(i,j) = integral;
       end
   end
 

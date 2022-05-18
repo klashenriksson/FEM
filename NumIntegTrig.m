@@ -1,10 +1,16 @@
-function value = NumIntegTrig(xtri, ytri, f, g_rs)
+function value = NumIntegTrig(xtri, ytri, f, g_rs, quadpts)
     J = [
             xtri(2) - xtri(1) ,xtri(3) - xtri(1);
             ytri(2) - ytri(1) ,ytri(3) - ytri(1) 
         ];
     area = 0.5 * det(J) ; % triangle area
-    [rspts,qwgts] = Gausspoints(4) ; % ref triangle quadrature points
+    
+    if exist('quadpts', 'var')
+        [rspts, qwgts] = Gausspoints(quadpts);
+    else
+        [rspts,qwgts] = Gausspoints(4) ; % ref triangle quadrature points
+    end
+    
     value = 0;
     for iq = 1:length(qwgts) % loop over quadrature points
         r = rspts(iq,1); % local quadrature point
