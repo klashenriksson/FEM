@@ -1,0 +1,43 @@
+function A = ElastiscityAssembler2D(p, t, S, dSdx, dSdy, D)
+    np = size(p,2);
+    nt = size(t,2);
+    nbf = length(S);
+    A = sparse(np,np); % allocate stiffness matrix
+
+    for K = 1:nt
+        A_K = zeros(2*nbf, 2*nbf);
+        dofs = t(:,K);
+        loc2glb = zeros(2*nbf, 1);
+        loc2glb(1:2:end-1) = 2 * dofs-1; loc2glb(2:2:end) = 2 * dofs;
+        xtri = p(1, t(1:3,K));
+        ytri = p(2, t(1:3,K));
+
+        BDAS = @(r,s) BasisDisplacementAndStrain(ShapeMat(r,s, 2));
+        J = [
+                xtri(2) - xtri(1) ,xtri(3) - xtri(1);
+                ytri(2) - ytri(1) ,ytri(3) - ytri(1) 
+            ];
+        area = 0.5 * det(J) ; % triangle area
+        qwgts = Gausspoints(4);
+
+        int_BDB = zeros(size())
+        for iq = 1:length(qwgts) % loop over quadrature points
+            r = rspts(iq,1); % local quadrature point
+            s = rspts(iq,2);
+            x = J(1 ,:) * [r;s] + xtri(1); % global quadrature point
+            y = J(2 ,:) * [r;s] + ytri(1);
+            dA = area * qwgts(iq) ; % quadrature weight
+
+            [phi, BDB] = BDAS(r,s);
+            if exist('g_rs', 'var')
+                value = value + dA .* BDB;
+            else
+                value = value + dA * f(x,y); % add to integral value
+            end
+        end
+
+        A_K(i,j) = NumIntegTrig(xtri, ytri, @(x,y) 1, BDB(i,j));
+
+        A(loc2glb, loc2glb) = A(loc2glb, loc2glb) + A_K;
+    end
+end
