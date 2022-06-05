@@ -1,4 +1,4 @@
-function A = ElastiscityAssembler2D(p, t, D, BDAS, nbf)
+function A = ElastiscityAssembler2D(p, t, D, nbf)
     np = size(p,2);
     nt = size(t,2);
     A = sparse(np*2,np*2); % allocate stiffness matrix
@@ -23,7 +23,16 @@ function A = ElastiscityAssembler2D(p, t, D, BDAS, nbf)
             s = rspts(iq,2);
             dA = area * qwgts(iq) ; % quadrature weight
 
-            [~, B] = BDAS(r,s);
+            if nbf == 3
+                [S, dSdr, dSds] = P1shapes(r,s);
+            else
+                [S, dSdr, dSds] = P2shapes(r,s);
+            end
+
+            dSdX = J'\[dSdr';dSds'];
+            dSdx = dSdX(1,:)'; dSdy = dSdX(2,:)';
+
+            [~, B] = BasisDisplacementAndStrain([S';dSdx';dSdy']);
             BDB = B' * D * B;
             A_K = A_K + BDB .* dA;
         end

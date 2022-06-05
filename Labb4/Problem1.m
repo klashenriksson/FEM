@@ -1,5 +1,5 @@
-clear
-close all
+%clear
+%close all
 rho = 1e-5;
 gD = @(x,y) [0,0];
 gN = @(x,y) [0,0];
@@ -23,4 +23,5 @@ end
 
 [U, p, e, t, A_tilde, b_tilde,D] = ElastiscityFEMSolver(p,e,t,f,gD,gN,ED,nu,polygrad,Dirichlet_boundary_nodes);
 
+figure;
 plotElasticity(p,t,U,D)

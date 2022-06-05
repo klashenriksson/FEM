@@ -1,4 +1,4 @@
-function b = ElastiscityLoadVector2D(p,t,f, nbf)
+function b = ElastiscityLoadVector2D(p,t,f, BDAS, nbf)
 np = size(p,2);
 nt = size(t,2);
 b = zeros(np*2,1);
@@ -25,7 +25,7 @@ for K = 1:nt
         y = J(2 ,:) * [r;s] + ytri(1);
         dA = area * qwgts(iq) ; % quadrature weight
 
-        if nbf == 3
+        if polygrad ==1
             [S, dSdr, dSds] = P1shapes(r,s);
         else
             [S, dSdr, dSds] = P2shapes(r,s);
@@ -34,7 +34,7 @@ for K = 1:nt
         dSdX = J'\[dSdr';dSds'];
         dSdx = dSdX(1,:)'; dSdy = dSdX(2,:)';
 
-        [phi, ~] = BasisDisplacementAndStrain([S';dSdx';dSdy']);
+        [~, B] = BasisDisplacementAndStrain([S';dSdx';dSdy']);
         phif = phi' * f(x,y);
         b_k = b_k + phif .* dA;
     end

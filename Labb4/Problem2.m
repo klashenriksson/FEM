@@ -7,7 +7,7 @@ ED = 1;
 [mu, lambda] = Enu2Lame(ED, nu);
 f = @(x,y) [(lambda + mu)*(1-2*x)*(1-2*y); -2*mu*y*(1-y) - 2*(lambda + 2 * mu)*x*(1-x)];
 u_anal = @(x,y) [0;-x.*(1-x).*y.*(1-y)];
-polygrad = 1;
+polygrad = 2;
 
 g = Rectg(0,0,1,1); % unit square
 h = 0.025;

@@ -3,7 +3,6 @@ function [U, p, e, t, A_tilde, b_tilde,D] = ElastiscityFEMSolver(p, e, t, f, gD,
     [mu,lambda] = Enu2Lame(E,nu);
 
     D = [lambda + 2*mu,lambda, 0;lambda, lambda + 2*mu,0;0,0,mu];
-    BDAS = @(r,s) GetPhiB(r,s,polygrad);
     nbf = 3*polygrad;
     boundary_values = zeros(length(Dirichlet_boundary_nodes) * 2, 1);
     for i = 1:length(Dirichlet_boundary_nodes)
@@ -12,8 +11,8 @@ function [U, p, e, t, A_tilde, b_tilde,D] = ElastiscityFEMSolver(p, e, t, f, gD,
         boundary_values(i*2) = bdry_val(2);
     end
     
-    A = ElastiscityAssembler2D(p,t,D,BDAS,nbf);
-    b = ElastiscityLoadVector2D(p,t,f,BDAS,nbf);
+    A = ElastiscityAssembler2D(p,t,D,nbf);
+    b = ElastiscityLoadVector2D(p,t,f,nbf);
     %bn = ElastiscityNeumanLoadVector(p,e,gN,BDAS);
 
     A_tilde = A;
