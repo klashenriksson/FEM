@@ -1,7 +1,7 @@
 function A = ElastiscityAssembler2D(p, t, D, BDAS, nbf)
     np = size(p,2);
     nt = size(t,2);
-    A = sparse(np,np); % allocate stiffness matrix
+    A = sparse(np*2,np*2); % allocate stiffness matrix
 
     for K = 1:nt
         A_K = zeros(2*nbf, 2*nbf);

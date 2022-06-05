@@ -1,10 +1,11 @@
 function b = ElastiscityLoadVector2D(p,t,f, BDAS, nbf)
 np = size(p,2);
 nt = size(t,2);
-b = zeros(np,1);
+b = zeros(np*2,1);
 
 for K = 1:nt
-    b_k = zeros(2, 2*nbf);
+    dofs = t(:,K);
+    b_k = zeros(2*nbf, 1);
     loc2glb = zeros(2*nbf, 1);
     loc2glb(1:2:end-1) = 2 * dofs-1; loc2glb(2:2:end) = 2 * dofs;
     xtri = p(1, t(1:3,K));
@@ -28,5 +29,5 @@ for K = 1:nt
         phif = phi' * f(x,y);
         b_k = b_k + phif .* dA;
     end
-    b(loc2glb) = b(loc2glb) + bK;
+    b(loc2glb,1) = b(loc2glb,1) + b_k;
 end
