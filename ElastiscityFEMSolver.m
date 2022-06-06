@@ -1,5 +1,4 @@
 function [U, p, e, t, A_tilde, b_tilde,D] = ElastiscityFEMSolver(p, e, t, f, gD, gN,E,nu,polygrad,Dirichlet_boundary_nodes)
-    e = e(1:2,:);
     [mu,lambda] = Enu2Lame(E,nu);
 
     D = [lambda + 2*mu,lambda, 0;lambda, lambda + 2*mu,0;0,0,mu];

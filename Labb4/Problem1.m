@@ -1,5 +1,5 @@
-%clear
-%close all
+clear
+close all
 rho = 1e-5;
 gD = @(x,y) [0,0];
 gN = @(x,y) [0,0];
@@ -8,7 +8,7 @@ nu = 0.3;
 ED = 1;
 polygrad = 1;
 
-g = Rectg(0,0,5,0.25); % unit square
+g = Rectg(0,0,5,0.75); % unit square
 h = 0.1;
 [p,e,t] = CreateMesh(g, h, polygrad);
 e = e(1:2,:);
