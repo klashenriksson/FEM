@@ -32,7 +32,7 @@ eigModes = phi(:,I);
 
 for i = 1:5
     figure;
-    fac = 5;
+    fac = 1;
     plotElasticity(p,t,fac*eigModes(:,i), D);
     title(strcat({'Eigenmode '},num2str(i)));
     xlabel(strcat({'Eigen frequency \omega='},...

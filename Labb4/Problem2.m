@@ -33,15 +33,16 @@ end
 [U, p, e, t, A_tilde, b_tilde,D] = ElastiscityFEMSolver(p,e,t,f,gD,gN,ED,nu,polygrad,bdry_nodes);
 
 %%
+anal = ((lambda + 3*mu)/90) * ones(length(energy_p1),1);
 figure;
-plot(hs, energy_p1);
+plot(hs, anal - energy_p1);
 hold on
-plot(hs, energy_p2);
-hold on
-fplot(@(x) (lambda + 3*mu)/90, [min(hs), max(hs)]);
+plot(hs, anal - energy_p2);
+%hold on
+%fplot(@(x) (lambda + 3*mu)/90, [min(hs), max(hs)]);
 legend("P1", "P2", "Analytic");
 xlabel("Mesh size h");
-ylabel("Energy Norm");
+ylabel("Error in Energy norm");
 %%
 nt = size(t, 2);
 u_anal_vec = zeros(length(U), 1);

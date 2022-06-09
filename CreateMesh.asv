@@ -1,0 +1,25 @@
+function [p,e,t, bdry_nodes] = CreateMesh(g, h, polygrad, bdry_checker)
+    [p,e,t] = initmesh(g, 'hmax', h);
+    if polygrad == 2
+        [p,t] = ChangeP1toP2Mesh(p,t);
+
+        for i = 1:size(e,2)
+            edgeNodes = e(:,i);
+            PositionNodes = p(:,edgeNodes(1:2));
+            midPoint = 0.5*(PositionNodes(:,1) + PositionNodes(:,2));
+            midNode = find(ismember(p,midPoint,'columns'));
+            e(end+1) = [edgeNodes(1); midNode edgeNodes(3:end)];
+            e(end+1) = [midNode edgeNodes(2) edgeNodes(3:end)];
+        end
+    end
+
+    bdry_nodes = [];
+    for i = 1:size(p, 2)
+        P = p(:,i);
+        if bdry_checker(P(1), P(2)) == 1
+            bdry_nodes(end+1) = i;
+        end
+    end
+
+    t(end,:)=[];
+end

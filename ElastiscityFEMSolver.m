@@ -12,10 +12,10 @@ function [U, p, e, t, A_tilde, b_tilde,D] = ElastiscityFEMSolver(p, e, t, f, gD,
     
     A = ElastiscityAssembler2D(p,t,D,nbf);
     b = ElastiscityLoadVector2D(p,t,f,nbf);
-    %bn = ElastiscityNeumanLoadVector(p,e,gN,BDAS);
+    bn = ElastiscityNeumanLoadVector(p,e,t,gN,polygrad);
 
     A_tilde = A;
-    b_tilde = b;
+    b_tilde = b+bn;
 
     diri_dofs = zeros(length(Dirichlet_boundary_nodes) * 2, 1);
     diri_dofs(1:2:end-1) = 2 * Dirichlet_boundary_nodes(:) - 1;
